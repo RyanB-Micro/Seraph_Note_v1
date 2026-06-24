@@ -6,7 +6,7 @@ class Project:
     def __init__(self, name):
         self.name = name
         self.project_sheets = [ ]
-        self.sheet_count = 0
+        self.sheet_count = 0 # For error checking
         self.selected_sheet = None
 
         self.create_sheet("Sheet 1")
@@ -15,6 +15,12 @@ class Project:
         new_sheet = sheet_ut.Sheet(sheet_name)
         self.project_sheets.append(new_sheet)
         self.sheet_count += 1
+
+    def delete_sheet(self, sheet_name):
+        for sheet in self.project_sheets:
+            if sheet.sheet_name == sheet_name:
+                self.project_sheets.remove(sheet)
+                self.sheet_count -= 1
 
 
 

@@ -2,7 +2,11 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
+import project_utils as prog_ut
 
+
+project_name = "SeraphNote__New_File__.pk1"
+project = None
 
 
 main_tab = None
@@ -25,37 +29,59 @@ def quit_all():
 def update_label(node_item, new_label):
     pass
 
+def add_sheet(project, label_entry):
+    sheet_name = label_entry.get()
+    project.create_sheet(sheet_name)
+    update_sheet_list(project)
 
-def detect_sheet_detection(project):
+def delete_sheet(project):
+    selected_list_index = sheet_listbox.curselection()
+    if selected_list_index:
+        index = selected_list_index[0]
+        selection = sheet_listbox.get(index)
+        project.delete_sheet(selection)
+        update_sheet_list(project)
+
+
+def update_sheet_list(project):
     # Get available project sheets
-    #sheet_listbox.delete(0, END)
+    sheet_listbox.delete(0, END)
     for sheet in project.project_sheets:
         if sheet.sheet_name not in sheet_listbox.get(0, END):
             sheet_listbox.insert(END, sheet.sheet_name)
 
+
+def detect_sheet_detection(label_entry):
     selected_list_index = sheet_listbox.curselection()
     if selected_list_index:
         index = selected_list_index[0]
         selection = sheet_listbox.get(index)
         print(selection)
+        label_entry.delete(0, END)
+        label_entry.insert(END, selection)
 
-    #root_window.after(100, lambda: detect_sheet_detection(project))
 
 def create_main_tab(tab, project):
     global sheet_listbox
     sheet_listbox = Listbox(tab)
     sheet_listbox.pack()
 
+    update_sheet_list(project)
+
+    Label(tab, text="Sheet Name: ").pack(side=LEFT)
+    label_entry = Entry(tab, width=30)
+    label_entry.pack(side=LEFT, padx=7)
+
     load_sheet_button = Button(tab, text="Load Sheet")
-    load_sheet_button.config(command=lambda: detect_sheet_detection(project))
+    load_sheet_button.config(command=lambda: detect_sheet_detection(label_entry))
     load_sheet_button.pack()
 
     add_sheet_button = Button(tab, text="Add Sheet")
-    # add_sheet_button.config(command=lambda: change_node_text())
+    add_sheet_button.config(command=lambda: add_sheet(project, label_entry))
     add_sheet_button.pack()
 
     remove_sheet_button = Button(tab, text="Remove Sheet")
-    # remove_sheet_button.config(command=lambda: change_node_text())
+    remove_sheet_button.config(command=lambda: delete_sheet(project))
     remove_sheet_button.pack()
 
 
@@ -109,8 +135,9 @@ def create_menus(window):
     window.config(menu=menu)
 
 
-def init_control(project):
-    global root_window, main_tab, bond_tab, node_tab, fact_tab, source_tab
+def init_control():
+    global root_window, main_tab, bond_tab, node_tab, fact_tab, source_tab, project
+    project = prog_ut.Project(project_name)
 
     root_window = Tk()
     root_window.geometry("400x300")
@@ -142,8 +169,5 @@ def init_control(project):
 
     # Add tool strip menu
     create_menus(root_window)
-
-    detect_sheet_detection(project)
-
 
     root_window.mainloop()

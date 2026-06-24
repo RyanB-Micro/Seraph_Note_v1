@@ -1,17 +1,15 @@
 
-import project_utils as prog_ut
+
 import control_utils as con_ut
 
 
 
-project_name = "SeraphNote__New_File__.pk1"
-project = None
+
 
 
 def main():
-    global project
-    project = prog_ut.Project(project_name)
-    con_ut.init_control(project)
+
+    con_ut.init_control()
 
 
 
