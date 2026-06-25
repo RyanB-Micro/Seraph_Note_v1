@@ -2,12 +2,17 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
+import threading
 import project_utils as prog_ut
+import screen_utils as screen_ut
+import project_style as proj_style
 
 
 project_name = "SeraphNote__New_File__.pk1"
 project = None
 
+stop_event = threading.Event()
+screen_thread = None
 
 main_tab = None
 bond_tab = None
@@ -18,6 +23,9 @@ root_window = None
 
 
 sheet_listbox = None
+
+current_sheet = None
+
 
 
 def quit_all():
@@ -56,9 +64,20 @@ def detect_sheet_detection(label_entry):
     if selected_list_index:
         index = selected_list_index[0]
         selection = sheet_listbox.get(index)
-        print(selection)
+        #print(selection)
         label_entry.delete(0, END)
         label_entry.insert(END, selection)
+        for sheet in project.project_sheets:
+            if sheet.sheet_name == selection:
+                load_sheet(sheet)
+
+
+def load_sheet(sheet):
+    global current_sheet
+    current_sheet = sheet
+    #screen_ut.init_screen(sheet)
+    #screen_ut.change_sheet(sheet)
+    screen_ut.working_sheet = sheet # not calling function in other thread
 
 
 def create_main_tab(tab, project):
@@ -135,9 +154,31 @@ def create_menus(window):
     window.config(menu=menu)
 
 
+def screen_loop():
+    while not stop_event.is_set():
+        if screen_ut.pygame_running == False:
+            screen_ut.init_screen(current_sheet)
+
+        screen_ut.screen_loop()
+        # Once screen loop finished -> close thread
+        stop_event.set()
+        break
+
+
 def init_control():
     global root_window, main_tab, bond_tab, node_tab, fact_tab, source_tab, project
+    global screen_thread, current_sheet
+
     project = prog_ut.Project(project_name)
+    current_sheet = project.project_sheets[0]
+    screen_ut.change_sheet(current_sheet)
+
+    stop_event.clear()
+    screen_thread.start()
+
+
+
+
 
     root_window = Tk()
     root_window.geometry("400x300")
@@ -171,3 +212,8 @@ def init_control():
     create_menus(root_window)
 
     root_window.mainloop()
+
+
+
+# Threads
+screen_thread = threading.Thread(target=screen_loop)

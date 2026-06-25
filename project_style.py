@@ -34,3 +34,17 @@ MINT_128 = (81, 216, 128)
 MINT_2x128 = (7, 128, 128)
 MINT_64 = (64, 128, 128)
 PURP_64 = (64, 64, 128)
+
+
+tool_strip_width = 64
+tool_width = 100
+tool_height = 50
+tool_spacing = 20
+
+
+switch_height = 30
+switch_width = 70
+switch_spacing = 70
+switch_choices = [("Fact Map", BLUE_128), ("Argument Map", PURP_64), ("Chapter Map", MINT_64)]
+
+
